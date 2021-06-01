@@ -1,0 +1,53 @@
+
+# iris 데이터 랜덤 추출 100 LDA 
+
+install.packages("MASS")
+data(iris)
+library(MASS)
+set.seed(1)
+train_data <- sample(1:150, 100)
+
+
+(ld <- lda(formula = Species ~ ., data = iris, subset = train_data))
+
+# 결과 
+# Call:
+#  lda(Species ~ ., data = iris, subset = train_data)
+
+# Prior probabilities of groups:
+#  setosa versicolor  virginica 
+# 0.34       0.31       0.35 
+
+# Group means:
+#  Sepal.Length Sepal.Width Petal.Length Petal.Width
+# setosa         5.020588    3.438235     1.467647    0.250000
+# versicolor     5.954839    2.767742     4.303226    1.319355
+# virginica      6.685714    2.965714     5.591429    2.022857
+
+# Coefficients of linear discriminants:
+#  LD1        LD2
+# Sepal.Length  0.9262525 -0.3105616
+# Sepal.Width   1.3900272 -1.8636222
+# Petal.Length -2.2019390  1.1597429
+# Petal.Width  -2.8290056 -3.0585818
+
+# Proportion of trace:
+#  LD1    LD2 
+# 0.9912 0.0088
+
+predict(ld, iris[-train_data,])$class
+predict(ld, iris[-train_data,])$posterior
+
+(tt <- table(iris$Species[-train_data], predict(ld, iris[-train_data,])$class))
+
+# 정오오류표 
+#            setosa versicolor virginica
+# setosa         16          0         0
+# versicolor      0         18         1
+# virginica       0          0        15
+
+# 정분류률(실제값과 예측값이 맞게 분류된 비율)
+
+sum(tt[row(tt) == col(tt)])/sum(tt) 
+
+# [1] 0.98 / 98% 
